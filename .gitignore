@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# TheWatcher specific
+data/
+templates/current.html
+*.log
+*.db
+*.sqlite
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# OS
+.directory
+.spotlight
+.trashes
+
+# Secrets
+.env
+*.key
+*.pem
+*.crt
