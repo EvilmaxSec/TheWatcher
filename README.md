@@ -66,9 +66,9 @@ You will NEVER use this tool for:
 
     ⚠️ THE AUTHOR ASSUMES NO LIABILITY FOR MISUSE OF THIS TOOL ⚠️
 screenshots
-  <p><img src="templates/img/1.png" alt="TheWatcher Banner" width="70%" height="360" />
-  <img src="templates/img/2.png" alt="TheWatcher Banner" width="60%" height="360" />
-<p style="text-align: center;">
+  <p><img src="templates/img/1.png" alt="TheWatcher Banner" width="70%" height="360" /></p>
+  <p></p><img src="templates/img/2.png" alt="TheWatcher Banner" width="60%" height="360" /></p>
+<p>
   <img src="templates/img/3.png" alt="TheWatcher Banner" width="45%" height="400" />
   <img src="templates/img/4.png" alt="TheWatcher Banner" width="45%" height="400" />
 </p>
