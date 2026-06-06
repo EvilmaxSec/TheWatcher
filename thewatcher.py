@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TheWatcher v2.0 - Professional Red Team Framework
+TheWatcher Professional Red Team Framework
 Author: EvilmaxSec
 """
 
