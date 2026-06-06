@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-# ============================================================
-# TheWatcher v2.0 - Professional Universal Installer
-# Author: EvilmaxSec
-# Description: Auto-detects system (Termux/Linux/macOS/Windows)
-#              and installs all dependencies automatically
-# ============================================================
-
 set -e  # Exit on error
 
 # ==================== COLORS ====================
@@ -47,7 +40,7 @@ print_banner() {
     echo -e "${END}"
     echo -e "${CYAN}${BOLD}"
     echo '╔═══════════════════════════════════════════════════════════════════════════╗'
-    echo '║                    TheWatcher v2.0 - Professional Installer               ║'
+    echo '║                    TheWatcher  Installer                                  ║'
     echo '║                      Auto-Detects & Installs Everything                   ║'
     echo '╚═══════════════════════════════════════════════════════════════════════════╝'
     echo -e "${END}"
