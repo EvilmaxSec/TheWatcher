@@ -534,8 +534,6 @@ main() {
     echo -e "${END}"
     echo ""
     echo -e "${CYAN}🚀 How to start:${END}"
-    echo -e "  ${YELLOW}cd $INSTALL_DIR && ./start.sh${END}"
-    echo -e "  ${YELLOW}OR${END}"
     echo -e "  ${YELLOW}cd $INSTALL_DIR && python3 thewatcher.py${END}"
     echo ""
     echo -e "${RED}${BOLD}⚠️  For authorized training use only!${END}\n"
