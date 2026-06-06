@@ -73,13 +73,13 @@ You will NEVER use this tool for:
   <img src="templates/img/4.png" alt="TheWatcher Banner" width="45%" height="400" />
 </p>
 
-🚀 Quick Installation
+<h1>🚀 Quick Installation</h1>
 One-Line Install (Linux/Kali/Ubuntu)
 ```bash
 git clone https://github.com/EvilmaxSec/TheWatcher.git && cd TheWatcher && chmod +x setup.sh && ./setup.sh
 ```
 
-Manual Installation
+<h1>Manual Installation</h1>
 ```bash
 # Clone repository
 git clone https://github.com/EvilmaxSec/TheWatcher.git
@@ -112,7 +112,7 @@ cd TheWatcher
 pip install -r requirements.txt
 python3 thewatcher.py
 ```
-🎮 Usage Guide
+<h1>🎮 Usage Guide</h1>
 Main Menu
 ```text
 ┌─────────────────────────────────────────────────┐
@@ -157,7 +157,7 @@ Silently captures camera images with realistic UI:
 - Likes, Comments, Shares
 - Caption text
 
-📊 Captured Data
+<h1>📊 Captured Data</h1>
 
 All data is saved locally in the data/ directory:
 ```text
@@ -191,7 +191,7 @@ Sample Location Output
 }
 ```
 
-🔧 Requirements
+<h1>🔧 Requirements</h1>
 Requirement	Version	Purpose
 PHP	7.4+	Web server
 Python	3.8+	CLI interface
