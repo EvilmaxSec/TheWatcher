@@ -306,7 +306,7 @@ main() {
     echo -e "${GREEN}${BOLD}╚═══════════════════════════════════════════════════════════════╝${END}"
     echo ""
     echo -e "${CYAN}🚀 START TheWatcher:${END}"
-    echo -e "  ${YELLOW}cd $INSTALL_DIR && python3 thewatcher.py${END}"
+    echo -e "  ${YELLOW}python3 thewatcher.py${END}"
     echo ""
     echo ""
     echo -e "${RED}${BOLD}⚠️  AUTHORIZED TRAINING USE ONLY${END}"
