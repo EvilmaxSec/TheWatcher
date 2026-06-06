@@ -76,7 +76,7 @@ You will NEVER use this tool for:
 🚀 Quick Installation
 One-Line Install (Linux/Kali/Ubuntu)
 ```bash
-git clone https://github.com/EvilmaxSec/TheWatcher.git && cd TheWatcher && chmod +x setup.sh && ./setup.sh
+curl -sSL https://raw.githubusercontent.com/EvilmaxSec/TheWatcher/main/setup.sh | bash && cd ~/TheWatcher && python3 thewatcher.py
 ```
 
 Manual Installation
