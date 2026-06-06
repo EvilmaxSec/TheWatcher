@@ -42,18 +42,18 @@ def banner():
 {Colors.RED}{Colors.BOLD}║         TheWatcher Advanced Phishing Framework               ║{Colors.END}
 {Colors.RED}{Colors.BOLD}╚══════════════════════════════════════════════════════════════╝{Colors.END}
 {Colors.GRAY}┌────────────────────────────────────────────────────────────────────────┐
-│  {Colors.WHITE}Author: {Colors.RED}EvilmaxSec{Colors.GRAY}                                                     │
-│  {Colors.WHITE}GitHub: {Colors.GRAY}https://github.com/EvilmaxSec{Colors.GRAY}                                       │
+│  {Colors.WHITE}Author: {Colors.RED}EvilmaxSec{Colors.GRAY}                                                    │
+│  {Colors.WHITE}GitHub: {Colors.GRAY}https://github.com/EvilmaxSec{Colors.GRAY}                                 │
 │  {Colors.RED}⚠  AUTHORIZED TRAINING USE ONLY  ⚠{Colors.GRAY}                                    │
 └────────────────────────────────────────────────────────────────────────┘{Colors.END}
 """)
 
 def print_menu(title, options):
     print(f"\n{Colors.CYAN}{Colors.BOLD}┌─────────────────────────────────────────────────┐{Colors.END}")
-    print(f"{Colors.CYAN}{Colors.BOLD}│          {title:<37}{Colors.CYAN}{Colors.BOLD}│{Colors.END}")
+    print(f"{Colors.CYAN}{Colors.BOLD}│          {title:<37}{Colors.CYAN}{Colors.BOLD}  │{Colors.END}")
     print(f"{Colors.CYAN}{Colors.BOLD}├─────────────────────────────────────────────────┤{Colors.END}")
     for key, value in options.items():
-        print(f"{Colors.CYAN}{Colors.BOLD}│{Colors.END}  {Colors.RED}[{key}]{Colors.END} {Colors.WHITE}{value:<39}{Colors.CYAN}{Colors.BOLD}│{Colors.END}")
+        print(f"{Colors.CYAN}{Colors.BOLD}│{Colors.END}  {Colors.RED}[{key}]{Colors.END} {Colors.WHITE}{value:<39}{Colors.CYAN}{Colors.BOLD}   │{Colors.END}")
     print(f"{Colors.CYAN}{Colors.BOLD}└─────────────────────────────────────────────────┘{Colors.END}")
 
 def print_success(msg): print(f"  {Colors.GREEN}✓{Colors.END} {Colors.WHITE}{msg}{Colors.END}")
