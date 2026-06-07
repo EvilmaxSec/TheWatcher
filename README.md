@@ -73,13 +73,7 @@ You will NEVER use this tool for:
   <img src="templates/img/4.png" alt="TheWatcher Banner" width="45%" height="400" />
 </p>
 
-🚀 Quick Installation
-One-Line Install (Linux/Kali/Termux/Ubuntu)
-```bash
-curl -sSL https://raw.githubusercontent.com/EvilmaxSec/TheWatcher/main/setup.sh | bash && cd ~/TheWatcher && python3 thewatcher.py
-```
-
-Manual Installation
+🚀 (Linux/Kali/Ubuntu) Installation
 ```bash
 # Clone repository
 git clone https://github.com/EvilmaxSec/TheWatcher.git
