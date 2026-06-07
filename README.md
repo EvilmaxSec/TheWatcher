@@ -94,7 +94,7 @@ pip install -r requirements.txt
 python3 thewatcher.py
 ```
 
-Termux (Android) Installation
+📱 Termux (Android) Installation
 ```bash
 pkg update && pkg upgrade
 pkg install php python wget
