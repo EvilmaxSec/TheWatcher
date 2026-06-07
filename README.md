@@ -74,7 +74,7 @@ You will NEVER use this tool for:
 </p>
 
 🚀 Quick Installation
-One-Line Install (Linux/Kali/Ubuntu)
+One-Line Install (Linux/Kali/Termux/Ubuntu)
 ```bash
 curl -sSL https://raw.githubusercontent.com/EvilmaxSec/TheWatcher/main/setup.sh | bash && cd ~/TheWatcher && python3 thewatcher.py
 ```
